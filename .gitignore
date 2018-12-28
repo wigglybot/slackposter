@@ -1,0 +1,6 @@
+# Python
+.venv
+
+# Pycharm
+.idea
+.pytest_cache

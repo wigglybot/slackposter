@@ -1,0 +1,40 @@
+kind: pipeline
+name: slackposter build
+
+steps:
+
+- name: run tests
+  image: pcp1976/pytest-3.7:1.0.7
+  environment:
+    REPOSITORY_KEY:
+      from_secret: REPOSITORY_KEY
+    ARTIFACTORY_URL:
+      from_secret: ARTIFACTORY_URL
+  commands:
+  - pipenv run pytest --junitxml=pytest.xml
+  - xsltproc -o junit.xml /opt/pytest-xunit.xsl pytest.xml
+  - curl -H "X-JFrog-Art-Api:$${REPOSITORY_KEY}" -T junit.xml "$${ARTIFACTORY_URL}/artifactory/wigglybot/${DRONE_COMMIT_BRANCH}/slackposter/junit.xml"
+
+- name: docker
+  pull: true
+  image: plugins/docker
+  settings:
+    username:
+      from_secret: HUB_USER
+    password:
+      from_secret: HUB_PASS
+    repo: pcp1976/slackposter
+    tags:
+      - 0.0.${DRONE_BUILD_NUMBER}
+      - latest
+
+- name: upload archive
+  image: pcp1976/pytest-3.7:1.0.7
+  environment:
+    REPOSITORY_KEY:
+      from_secret: REPOSITORY_KEY
+    ARTIFACTORY_URL:
+      from_secret: ARTIFACTORY_URL
+  commands:
+  - zip -r slackposter.zip *
+  - curl -H "X-JFrog-Art-Api:$${REPOSITORY_KEY}" -T slackposter.zip "$${ARTIFACTORY_URL}/artifactory/wigglybot/${DRONE_COMMIT_BRANCH}/slackposter/slackposter.zip"
