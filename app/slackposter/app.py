@@ -1,7 +1,3 @@
-# todo: subscribe to aggregate stream
-# todo: discard events which are not of type response
-# todo: post an event to dialogue describing result of attempting to post to slack
-
 import asyncio
 from photonpump import connect, exceptions
 import json

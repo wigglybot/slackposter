@@ -7,6 +7,7 @@ name = "pypi"
 photon-pump = "*"
 slackclient = "*"
 configobj = "*"
+pymongo = "*"
 
 [dev-packages]
 
